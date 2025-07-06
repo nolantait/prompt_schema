@@ -3,6 +3,7 @@ PATH
   specs:
     prompt_schema (0.1.0)
       dry-schema
+      dry-types
 
 GEM
   remote: https://rubygems.org/
