@@ -101,8 +101,16 @@ module PromptSchema
         }
       elsif name.equal?(:type?)
         type, _input = rest
-        keys[key].merge!(type.last.meta)
-        assign_type(key, type.last.name.downcase, opts.fetch(:nullable, false))
+        if type.last.is_a?(Dry::Types::Type)
+          keys[key].merge!(type.last.meta)
+          assign_type(
+            key,
+            type.last.name.downcase,
+            opts.fetch(:nullable, false)
+          )
+        else
+          visit(type.last.to_ast, { **opts, key: key, member: true })
+        end
       else
         type = PREDICATE_TO_TYPE[name]
         nullable = opts.fetch(:nullable, false)

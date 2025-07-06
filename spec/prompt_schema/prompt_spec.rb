@@ -13,8 +13,11 @@ RSpec.describe PromptSchema::Prompt do
 
   it "renders a prompt" do
     schema = Dry::Schema.Params do
-      required(:email).maybe(type?: Types::Email)
-      required(:name).filled(:string)
+      required(:user).hash do
+        required(:email).maybe(type?: Types::Email)
+        required(:name).filled(:string)
+      end
+      optional(:items).value(:array, min_size?: 1).each(type?: Types::Email)
     end
 
     prompt = described_class.new(schema)
@@ -23,10 +26,20 @@ RSpec.describe PromptSchema::Prompt do
     expected = <<~PROMPT
       Answer in JSON using this schema:
       {
-        // An email address
-        // @example email@example.com
-        email: string or null,
-        name: string,
+        user: {
+          // An email address
+          // @example email@example.com
+          email: string or null,
+          name: string,
+        },
+        // must be an array with at least 1 item
+        items: [
+          {
+            // An email address
+            // @example email@example.com
+            email: string,
+          } or null,
+        ],
       }
     PROMPT
 

@@ -10,6 +10,11 @@ RSpec.describe PromptSchema::SchemaCompiler do
         example: "email@example.com"
       )
     )
+    stub_const(
+      "Types::User", Dry::Types["strict.hash"].schema(
+        email: Types::Email
+      )
+    )
   end
 
   it "compiles a simple schema AST to a hash" do
@@ -56,6 +61,52 @@ RSpec.describe PromptSchema::SchemaCompiler do
               nullable: false,
               example: "email@example.com",
               description: "An email address"
+            }
+          }
+        }
+      }
+    }
+
+    expect(result).to eq(expected)
+  end
+
+  require "json"
+
+  it "compiles a type with metadata in an array" do
+    sub_schema = Dry::Schema.Params do
+      required(:email).value(type?: Types::Email)
+    end
+
+    schema = Dry::Schema.Params do
+      required(:strings).value(:array).each(type?: Types::Email)
+      optional(:items).value(:array).each(type?: sub_schema)
+    end
+
+    result = subject.call(schema.to_ast)
+
+    expected = {
+      keys: {
+        strings: {
+          type: "array",
+          required: true,
+          nullable: false,
+          description: "An email address",
+          example: "email@example.com",
+          member: "string"
+        },
+        items: {
+          type: "array",
+          required: false,
+          nullable: false,
+          member: {
+            keys: {
+              email: {
+                type: "string",
+                required: true,
+                nullable: false,
+                example: "email@example.com",
+                description: "An email address"
+              }
             }
           }
         }

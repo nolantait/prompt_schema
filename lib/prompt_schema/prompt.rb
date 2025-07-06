@@ -9,30 +9,38 @@ module PromptSchema
 
     def view_template
       text "Answer in JSON using this schema:"
-      inside("{", "}") do
-        @compiled[:keys].each do |key, info|
-          item(key, info)
-        end
-      end
+      render_structure(@compiled[:keys])
     end
 
     private
 
+    def render_structure(keys)
+      inside("{", "}") do
+        render_keys(keys)
+      end
+    end
+
+    def render_keys(keys)
+      keys.each do |key, info|
+        item(key, info)
+      end
+    end
+
     def item(key, info)
       comment info[:description] if info[:description]
       example info[:example] if info[:example]
-      text("#{key}: ", newline: false)
-
       case info[:type]
       when "array"
-        inside("[", "]") do
-          text info[:member][:type] if info[:member]
+        inside("#{key}: [", "],") do
+          render_structure(info[:keys])
         end
       when "hash"
-        inside("{", "}") do
-          text info[:member][:type] if info[:member]
+        inside("#{key}: {", "},") do
+          render_keys(info[:keys])
         end
       else
+        text("#{key}: ", newline: false)
+
         types = [info[:type], ("null" if info[:nullable])]
 
         text(
@@ -40,9 +48,9 @@ module PromptSchema
           newline: false,
           indent: false
         )
-      end
 
-      text(",", indent: false)
+        text(",", indent: false)
+      end
     end
 
     def inside(opening, closing, &)
