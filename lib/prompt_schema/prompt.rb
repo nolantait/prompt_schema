@@ -9,7 +9,7 @@ module PromptSchema
 
     def view_template
       text "Answer in JSON using this schema:"
-      with_nested("{", "}") do
+      inside("{", "}") do
         @compiled[:keys].each do |key, info|
           item(key, info)
         end
@@ -25,11 +25,11 @@ module PromptSchema
 
       case info[:type]
       when "array"
-        with_nested("[", "]") do
+        inside("[", "]") do
           text info[:member][:type] if info[:member]
         end
       when "hash"
-        with_nested("{", "}") do
+        inside("{", "}") do
           text info[:member][:type] if info[:member]
         end
       else
@@ -45,7 +45,7 @@ module PromptSchema
       text(",", indent: false)
     end
 
-    def with_nested(opening, closing, &)
+    def inside(opening, closing, &)
       text opening
       with_indentation(&)
       text closing
