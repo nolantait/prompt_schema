@@ -6,10 +6,8 @@ RSpec.describe PromptSchema::SchemaCompiler do
   before do
     stub_const(
       "Types::Email", Dry::Types["strict.string"].meta(
-        annotation: {
-          description: "An email address",
-          example: "email@example.com"
-        }
+        description: "An email address",
+        example: "email@example.com"
       )
     )
   end
@@ -34,7 +32,7 @@ RSpec.describe PromptSchema::SchemaCompiler do
 
   it "compiles a type with metadata" do
     schema = Dry::Schema.Params do
-      required(:email).filled(type?: Types::Email)
+      required(:email).value(type?: Types::Email)
     end
 
     result = subject.call(schema.to_ast)
@@ -44,10 +42,8 @@ RSpec.describe PromptSchema::SchemaCompiler do
         type: "string",
         required: true,
         nullable: false,
-        annotation: {
-          example: "email@example.com",
-          description: "An email address"
-        }
+        example: "email@example.com",
+        description: "An email address"
       }
     }
 
