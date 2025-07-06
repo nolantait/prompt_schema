@@ -29,6 +29,10 @@ module PromptSchema
     def item(key, info)
       comment info[:description] if info[:description]
       example info[:example] if info[:example]
+      handle_type(key, info)
+    end
+
+    def handle_type(key, info)
       case info[:type]
       when "array"
         inside("#{key}: [", "],") do

@@ -35,7 +35,7 @@ RSpec.describe PromptSchema::SchemaCompiler do
     expect(result).to eq(expected)
   end
 
-  it "compiles a type with metadata" do
+  it "compiles a type with metadata as a nested hash" do
     sub_schema = Dry::Schema.Params do
       required(:email).value(type?: Types::Email)
     end
