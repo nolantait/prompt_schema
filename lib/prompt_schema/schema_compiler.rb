@@ -85,25 +85,31 @@ module PromptSchema
       key = opts[:key]
 
       if name.equal?(:key?)
-        keys[rest[0][1]] = {
-          required: opts.fetch(:required, true)
-        }
+        (_, name), = rest
+        keys[name] = { required: opts.fetch(:required, true) }
       elsif name.equal?(:type?)
-        type, _input = rest
-        if type.last.is_a?(Dry::Types::Type)
-          keys[key].merge!(type.last.meta)
-          assign_type(
-            key,
-            type.last.name.downcase,
-            opts.fetch(:nullable, false)
-          )
-        else
-          visit(type.last.to_ast, { **opts, key: key, member: true })
-        end
+        visit_type(rest, opts)
       else
         type = PREDICATE_TO_TYPE[name]
         nullable = opts.fetch(:nullable, false)
         assign_type(key, type, nullable) if type
+      end
+    end
+
+    def visit_type(node, opts = EMPTY_HASH)
+      (_type, type_class), _input = node
+      key = opts[:key]
+
+      if type_class.is_a?(Dry::Types::Type)
+        keys[key].merge!(type_class.meta)
+
+        assign_type(
+          key,
+          type_class.name.downcase,
+          opts.fetch(:nullable, false)
+        )
+      else
+        visit(type_class.to_ast, { **opts, key: key, member: true })
       end
     end
 

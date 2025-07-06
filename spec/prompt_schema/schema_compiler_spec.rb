@@ -68,8 +68,6 @@ RSpec.describe PromptSchema::SchemaCompiler do
     expect(result).to eq(expected)
   end
 
-  require "json"
-
   it "compiles a type with metadata in an array" do
     sub_schema = Dry::Schema.Params do
       required(:email).value(type?: Types::Email)
