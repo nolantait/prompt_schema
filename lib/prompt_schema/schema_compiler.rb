@@ -18,34 +18,28 @@ module PromptSchema
       time?: "time"
     }.freeze
 
-    # @api private
     attr_reader :keys
 
     def self.call(ast) = new.call(ast)
 
-    # @api private
     def initialize
       @keys = EMPTY_HASH.dup
     end
 
-    # @api private
     def to_h
       { keys: keys }
     end
 
-    # @api private
     def call(ast)
       visit(ast)
       to_h
     end
 
-    # @api private
     def visit(node, opts = EMPTY_HASH)
       meth, rest = node
       public_send(:"visit_#{meth}", rest, opts)
     end
 
-    # @api private
     def visit_set(node, opts = EMPTY_HASH)
       target = (key = opts[:key]) ? self.class.new : self
 
@@ -59,7 +53,6 @@ module PromptSchema
       keys.update(key => { **keys[key], type: type, **target_info })
     end
 
-    # @api private
     def visit_and(node, opts = EMPTY_HASH)
       left, right = node
 
@@ -67,7 +60,6 @@ module PromptSchema
       visit(right, opts)
     end
 
-    # @api private
     def visit_implication(node, opts = EMPTY_HASH)
       case node
       in [:not, [:predicate, [:nil?, _]]], el
@@ -79,18 +71,15 @@ module PromptSchema
       end
     end
 
-    # @api private
     def visit_each(node, opts = EMPTY_HASH)
       visit(node, { **opts, member: true })
     end
 
-    # @api private
     def visit_key(node, opts = EMPTY_HASH)
       name, rest = node
       visit(rest, { **opts, key: name, required: true })
     end
 
-    # @api private
     def visit_predicate(node, opts = EMPTY_HASH)
       name, rest = node
       key = opts[:key]
@@ -118,7 +107,6 @@ module PromptSchema
       end
     end
 
-    # @api private
     def assign_type(key, type, nullable)
       if keys[key][:type]
         keys[key][:member] = type
