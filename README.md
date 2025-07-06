@@ -22,11 +22,26 @@ gem install prompt_schema
 Schemas are defined as a class that wraps a regular `dry-schema`:
 
 ```ruby
+schema = Dry::Schema.JSON do
+  required(:user).hash do
+    required(:email).maybe(:string)
+  end
+end
+
+prompt_schema = PromptSchema::Schema.new(schema)
+```
+
+For convenience you can use `define` to have this wrapping be done for you:
+
+```ruby
 schema = PromptSchema.define do
   required(:user).hash do
     required(:email).maybe(:string)
   end
 end
+
+schema.is_a?(PromptSchema::Schema) #=> true
+schema.dry_schema.is_a?(Dry::Schema) #=> true
 
 result = schema.call({ user: { email: "email@example.com" }})
 result.success? #=> true
