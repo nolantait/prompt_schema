@@ -26,4 +26,8 @@ module PromptSchema
     dry_schema = Dry::Schema.JSON(&)
     Schema.new(dry_schema)
   end
+
+  def self.compile(schema)
+    SchemaCompiler.call(schema.to_ast)
+  end
 end

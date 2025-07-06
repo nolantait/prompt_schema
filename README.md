@@ -100,6 +100,50 @@ Answer in JSON using this schema:
 
 This can be useful to get the best parts of BAML in a ruby native way.
 
+## How it works
+
+All `Dry::Schema` objects have an Abstract Syntax Tree (AST) that we can tap
+into to build another representation.
+
+We turn the dry schema AST into a structure that looks like this:
+
+```ruby
+schema = Dry::Schema.Params do
+  required(:user).hash do
+    required(:email).value(type?: Types::Email)
+  end
+end
+
+compiled = PromptSchema.compile(schema)
+
+expected = {
+  keys: {
+    user: {
+      type: "hash",
+      required: true,
+      nullable: false,
+      keys: {
+        email: {
+          type: "string",
+          required: true,
+          nullable: false,
+          example: "email@example.com",
+          description: "An email address"
+        }
+      }
+    }
+  }
+}
+
+compiled == expected #=> true
+```
+
+Then we use a renderer to take this compiled schema and output a string that can
+be used as part of a prompt.
+
+Rendering of the prompt is handled through a Phlex component. You could take
+this same representation and write your own version.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run
