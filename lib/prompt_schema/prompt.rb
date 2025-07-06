@@ -14,8 +14,14 @@ module PromptSchema
 
     private
 
-    def render_structure(keys)
-      inside("{", "}") do
+    def render_structure(keys, nullable: false, nested: false)
+      closing = [
+        "}",
+        (" or null" if nullable),
+        ("," if nested)
+      ].compact.join
+
+      inside("{", closing) do
         render_keys(keys)
       end
     end
@@ -35,8 +41,16 @@ module PromptSchema
     def handle_type(key, info)
       case info[:type]
       when "array"
-        inside("#{key}: [", "],") do
-          render_structure(info[:keys])
+        if info[:member].is_a?(Hash)
+          inside("#{key}: [", "],") do
+            render_structure(
+              info[:member][:keys],
+              nullable: info[:nullable],
+              nested: true
+            )
+          end
+        else
+          text("#{key}: #{info[:member]}[]")
         end
       when "hash"
         inside("#{key}: {", "},") do

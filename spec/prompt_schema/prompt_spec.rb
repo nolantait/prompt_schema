@@ -12,12 +12,16 @@ RSpec.describe PromptSchema::Prompt do
   end
 
   it "renders a prompt" do
+    sub_schema = Dry::Schema.Params do
+      required(:email).maybe(type?: Types::Email)
+    end
+
     schema = Dry::Schema.Params do
       required(:user).hash do
         required(:email).maybe(type?: Types::Email)
         required(:name).filled(:string)
       end
-      optional(:items).value(:array, min_size?: 1).each(type?: Types::Email)
+      optional(:items).maybe(:array, min_size?: 1).each(type?: sub_schema)
     end
 
     prompt = described_class.new(schema)
@@ -32,12 +36,11 @@ RSpec.describe PromptSchema::Prompt do
           email: string or null,
           name: string,
         },
-        // must be an array with at least 1 item
         items: [
           {
             // An email address
             // @example email@example.com
-            email: string,
+            email: string or null,
           } or null,
         ],
       }

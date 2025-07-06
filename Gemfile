@@ -10,3 +10,4 @@ gem "irb"
 gem "rake"
 gem "rspec"
 gem "rubocop-inhouse", require: false
+gem "super_diff"

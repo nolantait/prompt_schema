@@ -23,6 +23,7 @@ GEM
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
     ast (2.4.3)
+    attr_extras (7.1.0)
     base64 (0.3.0)
     benchmark (0.4.1)
     bigdecimal (3.2.2)
@@ -76,10 +77,13 @@ GEM
     lint_roller (1.1.0)
     logger (1.7.0)
     minitest (5.25.5)
+    optimist (3.2.1)
     parallel (1.27.0)
     parser (3.3.8.0)
       ast (~> 2.4.1)
       racc
+    patience_diff (1.2.0)
+      optimist (~> 3.0)
     phlex (2.3.1)
       zeitwerk (~> 2.7)
     pp (0.6.2)
@@ -164,6 +168,10 @@ GEM
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     stringio (3.1.7)
+    super_diff (0.16.0)
+      attr_extras (>= 6.2.4)
+      diff-lcs
+      patience_diff
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.1.4)
@@ -183,6 +191,7 @@ DEPENDENCIES
   rake
   rspec
   rubocop-inhouse
+  super_diff
 
 BUNDLED WITH
    2.6.7

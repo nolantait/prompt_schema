@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "debug"
+require "super_diff/rspec"
+
 require "prompt_schema"
 
 RSpec.configure do |config|
