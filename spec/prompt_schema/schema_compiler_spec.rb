@@ -33,20 +33,31 @@ RSpec.describe PromptSchema::SchemaCompiler do
   end
 
   it "compiles a type with metadata" do
-    schema = Dry::Schema.Params do
+    sub_schema = Dry::Schema.Params do
       required(:email).value(type?: Types::Email)
+    end
+
+    schema = Dry::Schema.Params do
+      required(:user).hash(sub_schema)
     end
 
     result = subject.call(schema.to_ast)
 
     expected = {
       keys: {
-        email: {
-          type: "string",
+        user: {
+          type: "hash",
           required: true,
           nullable: false,
-          example: "email@example.com",
-          description: "An email address"
+          keys: {
+            email: {
+              type: "string",
+              required: true,
+              nullable: false,
+              example: "email@example.com",
+              description: "An email address"
+            }
+          }
         }
       }
     }
