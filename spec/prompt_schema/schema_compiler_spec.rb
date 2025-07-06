@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-Undefined = Dry::Core::Constants::Undefined
-
 RSpec.describe PromptSchema::SchemaCompiler do
   before do
     stub_const(
