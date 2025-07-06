@@ -16,6 +16,6 @@ RSpec.describe PromptSchema::Prompt do
       }
     PROMPT
 
-    expect(result).to eq(expected.strip)
+    expect(result).to eq(expected)
   end
 end
