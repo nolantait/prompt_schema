@@ -36,7 +36,7 @@ module PromptSchema
     # @api private
     def call(ast)
       visit(ast)
-      @keys
+      to_h
     end
 
     # @api private

@@ -20,10 +20,12 @@ RSpec.describe PromptSchema::SchemaCompiler do
     result = subject.call(schema.to_ast)
 
     expected = {
-      name: {
-        type: "string",
-        required: true,
-        nullable: false
+      keys: {
+        name: {
+          type: "string",
+          required: true,
+          nullable: false
+        }
       }
     }
 
@@ -38,12 +40,14 @@ RSpec.describe PromptSchema::SchemaCompiler do
     result = subject.call(schema.to_ast)
 
     expected = {
-      email: {
-        type: "string",
-        required: true,
-        nullable: false,
-        example: "email@example.com",
-        description: "An email address"
+      keys: {
+        email: {
+          type: "string",
+          required: true,
+          nullable: false,
+          example: "email@example.com",
+          description: "An email address"
+        }
       }
     }
 
