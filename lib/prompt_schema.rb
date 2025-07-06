@@ -23,7 +23,7 @@ module PromptSchema
   #
   # @return [PromptSchema::Schema]
   def self.define(&)
-    dry_schema = Dry::Schema.define(&)
+    dry_schema = Dry::Schema.JSON(&)
     Schema.new(dry_schema)
   end
 end
