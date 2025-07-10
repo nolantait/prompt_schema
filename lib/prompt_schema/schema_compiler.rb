@@ -85,10 +85,9 @@ module PromptSchema
       key = opts[:key]
 
       if name.equal?(:key?)
-        (_, name), = rest
-        keys[name] = { required: opts.fetch(:required, true) }
+        visit_predicate_key(rest, opts)
       elsif name.equal?(:type?)
-        visit_type(rest, opts)
+        visit_predicate_type(rest, opts)
       else
         type = PREDICATE_TO_TYPE[name]
         nullable = opts.fetch(:nullable, false)
@@ -96,7 +95,12 @@ module PromptSchema
       end
     end
 
-    def visit_type(node, opts = EMPTY_HASH)
+    def visit_predicate_key(node, opts = EMPTY_HASH)
+      (_, name), = node
+      keys[name] = { required: opts.fetch(:required, true) }
+    end
+
+    def visit_predicate_type(node, opts = EMPTY_HASH)
       (_type, type_class), _input = node
       key = opts[:key]
 
