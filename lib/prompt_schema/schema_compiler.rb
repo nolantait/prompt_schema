@@ -84,15 +84,20 @@ module PromptSchema
       name, rest = node
       key = opts[:key]
 
-      if name.equal?(:key?)
+      case name
+      when :key?
         visit_predicate_key(rest, opts)
-      elsif name.equal?(:type?)
+      when :type?
         visit_predicate_type(rest, opts)
       else
-        type = PREDICATE_TO_TYPE[name]
-        nullable = opts.fetch(:nullable, false)
-        assign_type(key, type, nullable) if type
+        visit_predicate_base_type(name, key, opts)
       end
+    end
+
+    def visit_predicate_base_type(name, key, opts = EMPTY_HASH)
+      type = PREDICATE_TO_TYPE[name]
+      nullable = opts.fetch(:nullable, false)
+      assign_type(key, type, nullable) if type
     end
 
     def visit_predicate_key(node, opts = EMPTY_HASH)
@@ -118,7 +123,7 @@ module PromptSchema
     end
 
     def assign_type(key, type, nullable)
-      if keys[key][:type]
+      if keys.dig(key, :type)
         keys[key][:member] = type
       else
         keys[key][:type] = type
