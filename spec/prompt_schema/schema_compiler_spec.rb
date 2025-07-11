@@ -37,7 +37,7 @@ RSpec.describe PromptSchema::SchemaCompiler do
 
   it "compiles a type with metadata as a nested hash" do
     sub_schema = Dry::Schema.Params do
-      required(:email).value(type?: Types::Email)
+      required(:email).value(Types::Email)
     end
 
     schema = Dry::Schema.Params do
