@@ -20,7 +20,7 @@ RSpec.describe PromptSchema::SchemaCompiler do
       required(:name).filled(:str?)
     end
 
-    result = subject.call(schema.to_ast)
+    result = described_class.call(schema)
 
     expected = {
       keys: {
@@ -44,7 +44,7 @@ RSpec.describe PromptSchema::SchemaCompiler do
       required(:user).hash(sub_schema)
     end
 
-    result = subject.call(schema.to_ast)
+    result = described_class.call(schema)
 
     expected = {
       keys: {
@@ -78,7 +78,7 @@ RSpec.describe PromptSchema::SchemaCompiler do
       optional(:items).value(:array).each(type?: sub_schema)
     end
 
-    result = subject.call(schema.to_ast)
+    result = described_class.call(schema)
 
     expected = {
       keys: {

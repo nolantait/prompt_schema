@@ -28,6 +28,6 @@ module PromptSchema
   end
 
   def self.compile(schema)
-    SchemaCompiler.call(schema.to_ast)
+    SchemaCompiler.call(schema)
   end
 end

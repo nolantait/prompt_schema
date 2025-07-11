@@ -12,16 +12,16 @@ RSpec.describe PromptSchema::Prompt do
   end
 
   it "renders a prompt" do
-    sub_schema = Dry::Schema.Params do
-      required(:email).maybe(type?: Types::Email)
-    end
-
     schema = Dry::Schema.Params do
       required(:user).hash do
-        required(:email).maybe(type?: Types::Email)
+        required(:email).maybe(Types::Email)
         required(:name).filled(:string)
       end
-      optional(:items).maybe(:array, min_size?: 1).each(type?: sub_schema)
+      optional(:items).maybe(:array, min_size?: 1) do
+        each(:hash) do
+          required(:email).maybe(Types::Email)
+        end
+      end
     end
 
     prompt = described_class.new(schema)

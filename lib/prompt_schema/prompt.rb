@@ -3,7 +3,7 @@
 module PromptSchema
   class Prompt < Phlex::HTML
     def initialize(schema)
-      @compiled = SchemaCompiler.call(schema.to_ast)
+      @compiled = SchemaCompiler.call(schema)
       @indentation = 0
     end
 
@@ -93,7 +93,7 @@ module PromptSchema
 
     def text(content, newline: true, indent: true)
       plain " " * @indentation if indent
-      plain content
+      raw safe(content)
       plain "\n" if newline
     end
   end

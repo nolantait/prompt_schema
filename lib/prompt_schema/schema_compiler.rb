@@ -20,9 +20,10 @@ module PromptSchema
 
     attr_reader :keys
 
-    def self.call(ast) = new.call(ast)
+    def self.call(schema) = new(schema).call
 
-    def initialize
+    def initialize(schema)
+      @schema = schema
       @keys = EMPTY_HASH.dup
     end
 
@@ -30,8 +31,8 @@ module PromptSchema
       { keys: keys }
     end
 
-    def call(ast)
-      visit(ast)
+    def call
+      visit(@schema.to_ast)
       to_h
     end
 
@@ -41,7 +42,7 @@ module PromptSchema
     end
 
     def visit_set(node, opts = EMPTY_HASH)
-      target = (key = opts[:key]) ? self.class.new : self
+      target = (key = opts[:key]) ? self.class.new(@schema) : self
 
       node.each { |child| target.visit(child, opts) }
 
