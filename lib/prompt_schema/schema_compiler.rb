@@ -36,16 +36,16 @@ module PromptSchema
       to_h
     end
 
-    def visit(node, opts = EMPTY_HASH)
+    def visit(node, **)
       meth, rest = node
-      public_send(:"visit_#{meth}", rest, **opts)
+      public_send(:"visit_#{meth}", rest, **)
     end
 
     def visit_set(node, **opts)
       key = opts[:key]
       target = key ? self.class.new(@schema) : self
 
-      node.each { |child| target.visit(child, opts) }
+      node.each { |child| target.visit(child, **opts) }
 
       return unless key
 
@@ -56,31 +56,31 @@ module PromptSchema
       keys.update(key => data)
     end
 
-    def visit_and(node, **opts)
+    def visit_and(node, **)
       left, right = node
 
-      visit(left, opts)
-      visit(right, opts)
+      visit(left, **)
+      visit(right, **)
     end
 
     def visit_implication(node, **)
       case node
       in [:not, [:predicate, [:nil?, _]]], el
-        visit(el, { **, nullable: true })
+        visit(el, **, nullable: true)
       else
         node.each do |el|
-          visit(el, { **, required: false })
+          visit(el, **, required: false)
         end
       end
     end
 
     def visit_each(node, **)
-      visit(node, { **, member: true })
+      visit(node, **, member: true)
     end
 
     def visit_key(node, **)
       name, rest = node
-      visit(rest, { **, key: name, required: true })
+      visit(rest, **, key: name, required: true)
     end
 
     def visit_predicate(node, **opts)
@@ -121,7 +121,7 @@ module PromptSchema
           opts.fetch(:nullable, false)
         )
       else
-        visit(type_class.to_ast, { **opts, key: key, member: true })
+        visit(type_class.to_ast, **opts, key: key, member: true)
       end
     end
 
