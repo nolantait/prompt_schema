@@ -17,7 +17,7 @@ RSpec.describe PromptSchema::SchemaCompiler do
 
   it "compiles a simple schema AST to a hash" do
     schema = Dry::Schema.Params do
-      required(:name).filled(:str?)
+      required(:name).filled(:string)
     end
 
     result = described_class.call(schema)

@@ -24,6 +24,7 @@ module PromptSchema
 
     def initialize(schema)
       @schema = schema
+      @type_schema = TypeSchemaCompiler.call(schema.type_schema.to_ast)
       @keys = EMPTY_HASH.dup
     end
 
@@ -45,7 +46,7 @@ module PromptSchema
       key = opts[:key]
       target = key ? self.class.new(@schema) : self
 
-      node.each { |child| target.visit(child, **opts) }
+      node.each { |child| target.visit(child, **opts.except(:member)) }
 
       return unless key
 
@@ -105,7 +106,8 @@ module PromptSchema
 
     def visit_predicate_key(node, **opts)
       (_, name), = node
-      keys[name] = { required: opts.fetch(:required, true) }
+      keys[name] ||= {}
+      keys[name] = { **keys[name], required: opts.fetch(:required, true) }
     end
 
     def visit_predicate_type(node, **opts)

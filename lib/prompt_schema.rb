@@ -7,6 +7,7 @@ require "dry/types"
 require "phlex"
 
 require_relative "prompt_schema/version"
+require_relative "prompt_schema/type_schema_compiler"
 require_relative "prompt_schema/schema_compiler"
 require_relative "prompt_schema/schema"
 require_relative "prompt_schema/prompt"
