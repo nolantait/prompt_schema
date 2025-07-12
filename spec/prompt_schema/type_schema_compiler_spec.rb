@@ -9,6 +9,9 @@ RSpec.describe PromptSchema::TypeSchemaCompiler do
       end
       required(:hobbies).array(:hash) do
         required(:name).filled(Dry::Types["nominal.string"].meta(description: "Hobby name"))
+        optional(:tags).array(:hash) do
+          required(:name).filled(Dry::Types["nominal.string"].meta(description: "Tag name"))
+        end
       end
     end
 
@@ -42,6 +45,19 @@ RSpec.describe PromptSchema::TypeSchemaCompiler do
               type: "string",
               description: "Hobby name",
               maybe: false
+            },
+            tags: {
+              required: false,
+              type: "array",
+              maybe: false,
+              items: {
+                name: {
+                  required: false,
+                  type: "string",
+                  description: "Tag name",
+                  maybe: false
+                }
+              }
             }
           }
         }

@@ -88,6 +88,7 @@ module PromptSchema
       opts[:key_path] << name
 
       visit(rest, **opts, key: name, required: true)
+      opts[:key_path].pop
     end
 
     def visit_predicate(node, **opts)
@@ -150,6 +151,8 @@ module PromptSchema
 
       meta = @type_schema.dig(*opts[:key_path])
       keys[key].merge!(meta.slice(:description, :example)) if meta
+
+      debugger if meta.nil? && key == :email
     end
   end
 end

@@ -91,13 +91,14 @@ RSpec.describe PromptSchema::SchemaCompiler do
   end
 
   it "compiles a type with metadata in an array" do
-    sub_schema = Dry::Schema.Params do
-      required(:email).value(type?: Types::Email)
-    end
-
     schema = Dry::Schema.Params do
       required(:strings).value(:array).each(type?: Types::Email)
-      optional(:items).value(:array).each(type?: sub_schema)
+      optional(:items).array(:hash) do
+        required(:email).value(type?: Types::Email)
+        optional(:other_emails).array(:hash) do
+          required(:email).filled(Types::Email)
+        end
+      end
     end
 
     result = described_class.call(schema)
@@ -124,6 +125,22 @@ RSpec.describe PromptSchema::SchemaCompiler do
                 nullable: false,
                 example: "email@example.com",
                 description: "An email address"
+              },
+              other_emails: {
+                type: "array",
+                required: false,
+                nullable: false,
+                member: {
+                  keys: {
+                    email: {
+                      type: "string",
+                      required: true,
+                      nullable: false,
+                      example: "email@example.com",
+                      description: "An email address"
+                    }
+                  }
+                }
               }
             }
           }
