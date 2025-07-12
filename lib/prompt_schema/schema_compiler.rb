@@ -38,11 +38,12 @@ module PromptSchema
 
     def visit(node, opts = EMPTY_HASH)
       meth, rest = node
-      public_send(:"visit_#{meth}", rest, opts)
+      public_send(:"visit_#{meth}", rest, **opts)
     end
 
-    def visit_set(node, opts = EMPTY_HASH)
-      target = (key = opts[:key]) ? self.class.new(@schema) : self
+    def visit_set(node, **opts)
+      key = opts[:key]
+      target = key ? self.class.new(@schema) : self
 
       node.each { |child| target.visit(child, opts) }
 
@@ -50,63 +51,64 @@ module PromptSchema
 
       target_info = opts[:member] ? { member: target.to_h } : target.to_h
       type = opts[:member] ? "array" : "hash"
+      data = { **keys[key], type:, **target_info }
 
-      keys.update(key => { **keys[key], type: type, **target_info })
+      keys.update(key => data)
     end
 
-    def visit_and(node, opts = EMPTY_HASH)
+    def visit_and(node, **opts)
       left, right = node
 
       visit(left, opts)
       visit(right, opts)
     end
 
-    def visit_implication(node, opts = EMPTY_HASH)
+    def visit_implication(node, **)
       case node
       in [:not, [:predicate, [:nil?, _]]], el
-        visit(el, { **opts, nullable: true })
+        visit(el, { **, nullable: true })
       else
         node.each do |el|
-          visit(el, { **opts, required: false })
+          visit(el, { **, required: false })
         end
       end
     end
 
-    def visit_each(node, opts = EMPTY_HASH)
-      visit(node, { **opts, member: true })
+    def visit_each(node, **)
+      visit(node, { **, member: true })
     end
 
-    def visit_key(node, opts = EMPTY_HASH)
+    def visit_key(node, **)
       name, rest = node
-      visit(rest, { **opts, key: name, required: true })
+      visit(rest, { **, key: name, required: true })
     end
 
-    def visit_predicate(node, opts = EMPTY_HASH)
+    def visit_predicate(node, **opts)
       name, rest = node
       key = opts[:key]
 
       case name
       when :key?
-        visit_predicate_key(rest, opts)
+        visit_predicate_key(rest, **opts)
       when :type?
-        visit_predicate_type(rest, opts)
+        visit_predicate_type(rest, **opts)
       else
-        visit_predicate_base_type(name, key, opts)
+        visit_predicate_base_type(name, key, **opts)
       end
     end
 
-    def visit_predicate_base_type(name, key, opts = EMPTY_HASH)
+    def visit_predicate_base_type(name, key, **opts)
       type = PREDICATE_TO_TYPE[name]
       nullable = opts.fetch(:nullable, false)
       assign_type(key, type, nullable) if type
     end
 
-    def visit_predicate_key(node, opts = EMPTY_HASH)
+    def visit_predicate_key(node, **opts)
       (_, name), = node
       keys[name] = { required: opts.fetch(:required, true) }
     end
 
-    def visit_predicate_type(node, opts = EMPTY_HASH)
+    def visit_predicate_type(node, **opts)
       (_type, type_class), _input = node
       key = opts[:key]
 
