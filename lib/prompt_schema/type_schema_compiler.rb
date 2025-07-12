@@ -17,27 +17,21 @@ module PromptSchema
 
     def visit_schema(node)
       keys, _options, _meta = node
-      { keys: keys.to_h { visit(it) } }
+      keys.to_h { |key| visit(key) }
     end
 
     def visit_key(node)
-      name, _required, type_node = node
-      [name, visit(type_node)]
+      name, required, type_node = node
+      type_info = visit(type_node)
+      [name, { required: required, **type_info }]
     end
 
     def visit_nominal(node)
       klass, meta = node
-
-      if klass.respond_to?(:to_ast)
-        {
-          keys: visit(klass.to_ast)
-        }
-      else
-        {
-          type: dry_type_name(klass),
-          **filtered_meta(meta)
-        }
-      end
+      {
+        type: dry_type_name(klass),
+        **meta
+      }
     end
 
     def visit_maybe(node)
@@ -46,48 +40,26 @@ module PromptSchema
       inner
     end
 
-    def visit_hash(node)
-      opts, _meta = node
-      { keys: visit_schema([opts[:keys], {}, {}]) }
-    end
-
     def visit_array(node)
-      member, meta = node
-      member_type = member.is_a?(Class) ? dry_type_name(member) : visit(member)[:type]
+      member_node, meta = node
+      member = if member_node.is_a?(Class)
+        dry_type_name(member_node)
+      else
+        visit(member_node)[:type]
+      end
+
       {
-        type: "array[#{member_type}]",
-        **filtered_meta(meta)
+        type: "array[#{member}]",
+        **meta
       }
     end
 
     def visit_sum(node)
       *types, meta = node
+      type_names = types.map { |t| visit(t)[:type] }
       {
-        type: types.map { |t| visit(t)[:type] }.join(" | "),
-        **filtered_meta(meta)
-      }
-    end
-
-    def visit_constructor(node)
-      visit(node.first)
-    end
-
-    def visit_lax(node)
-      visit(node)
-    end
-
-    def visit_enum(node)
-      type, mapping = node
-      {
-        type: "enum(#{visit(type)[:type]})",
-        values: mapping.values
-      }
-    end
-
-    def visit_any(meta)
-      {
-        type: "any",
-        **filtered_meta(meta)
+        type: type_names.join(" | "),
+        **meta
       }
     end
 
@@ -95,20 +67,43 @@ module PromptSchema
       key_type, value_type, meta = node
       {
         type: "map[#{visit(key_type)[:type]} => #{visit(value_type)[:type]}]",
-        **filtered_meta(meta)
+        **meta
       }
     end
 
     def visit_constrained(node)
-      visit(node.first)
+      base_type, rule = node
+      base = visit(base_type)
+      base[:rule] = rule
+      base
+    end
+
+    def visit_constructor(node)
+      base_type, _fn = node
+      visit(base_type)
+    end
+
+    def visit_lax(node)
+      visit(node)
+    end
+
+    def visit_enum(node)
+      type_node, mapping = node
+      {
+        type: "enum(#{visit(type_node)[:type]})",
+        values: mapping.values
+      }
+    end
+
+    def visit_any(meta)
+      {
+        type: "any",
+        **meta
+      }
     end
 
     def dry_type_name(klass)
-      Dry::Types.identifier(klass)&.to_s || klass.name || klass.to_s
-    end
-
-    def filtered_meta(meta)
-      meta.reject { |k, _| %i[required maybe].include?(k) }
+      Dry::Types.identifier(klass) || klass.name || klass.to_s
     end
   end
 end

@@ -79,9 +79,12 @@ module PromptSchema
       visit(node, **, member: true)
     end
 
-    def visit_key(node, **)
+    def visit_key(node, **opts)
       name, rest = node
-      visit(rest, **, key: name, required: true)
+      opts[:key_path] ||= []
+      opts[:key_path] << name
+
+      visit(rest, **opts, key: name, required: true)
     end
 
     def visit_predicate(node, **opts)
@@ -100,8 +103,14 @@ module PromptSchema
 
     def visit_predicate_base_type(name, key, **opts)
       type = PREDICATE_TO_TYPE[name]
-      nullable = opts.fetch(:nullable, false)
-      assign_type(key, type, nullable) if type
+      return unless type
+
+      assign_type(
+        key,
+        type,
+        **opts,
+        nullable: opts.fetch(:nullable, false)
+      )
     end
 
     def visit_predicate_key(node, **opts)
@@ -120,20 +129,24 @@ module PromptSchema
         assign_type(
           key,
           type_class.name.downcase,
-          opts.fetch(:nullable, false)
+          **opts,
+          nullable: opts.fetch(:nullable, false)
         )
       else
         visit(type_class.to_ast, **opts, key: key, member: true)
       end
     end
 
-    def assign_type(key, type, nullable)
+    def assign_type(key, type, **opts)
       if keys.dig(key, :type)
         keys[key][:member] = type
       else
         keys[key][:type] = type
-        keys[key][:nullable] = nullable
+        keys[key][:nullable] = opts.fetch(:nullable, false)
       end
+
+      meta = @type_schema.dig(*opts[:key_path])
+      keys[key].merge!(meta.slice(:description, :example)) if meta
     end
   end
 end

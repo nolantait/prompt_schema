@@ -13,19 +13,20 @@ RSpec.describe PromptSchema::TypeSchemaCompiler do
 
     expect(result).to eq(
       {
-        keys: {
-          name: {
+        name: {
+          required: false,
+          type: "string",
+          description: "The name of the person",
+          maybe: false
+        },
+        address: {
+          required: false,
+          street: {
+            required: false,
             type: "string",
-            description: "The name of the person"
-          },
-          address: {
-            keys: {
-              street: {
-                type: "string",
-                description: "Street address",
-                something: "Something"
-              }
-            }
+            description: "Street address",
+            something: "Something",
+            maybe: false
           }
         }
       }

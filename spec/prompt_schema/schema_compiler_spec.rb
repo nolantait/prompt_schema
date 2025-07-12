@@ -35,6 +35,28 @@ RSpec.describe PromptSchema::SchemaCompiler do
     expect(result).to eq(expected)
   end
 
+  it "compiles a simple schema with a type AST to a hash" do
+    schema = Dry::Schema.Params do
+      required(:email).filled(Types::Email)
+    end
+
+    result = described_class.call(schema)
+
+    expected = {
+      keys: {
+        email: {
+          type: "string",
+          required: true,
+          nullable: false,
+          description: "An email address",
+          example: "email@example.com"
+        }
+      }
+    }
+
+    expect(result).to eq(expected)
+  end
+
   it "compiles a type with metadata as a nested hash" do
     sub_schema = Dry::Schema.Params do
       required(:email).value(Types::Email)
