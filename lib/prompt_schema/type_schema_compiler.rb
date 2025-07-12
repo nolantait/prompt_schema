@@ -42,14 +42,18 @@ module PromptSchema
 
     def visit_array(node)
       member_node, meta = node
-      member = if member_node.is_a?(Class)
-        dry_type_name(member_node)
+
+      member_info = if member_node.is_a?(Array) && member_node.first == :schema
+        visit_schema(member_node.last)
+      elsif member_node.is_a?(Class)
+        { type: dry_type_name(member_node) }
       else
-        visit(member_node)[:type]
+        visit(member_node)
       end
 
       {
-        type: "array[#{member}]",
+        type: "array",
+        items: member_info,
         **meta
       }
     end

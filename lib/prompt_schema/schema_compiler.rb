@@ -75,8 +75,11 @@ module PromptSchema
       end
     end
 
-    def visit_each(node, **)
-      visit(node, **, member: true)
+    def visit_each(node, **opts)
+      opts[:key_path] ||= []
+      opts[:key_path] << :items
+
+      visit(node, **opts, member: true)
     end
 
     def visit_key(node, **opts)

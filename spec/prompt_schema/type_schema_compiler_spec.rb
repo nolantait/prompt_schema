@@ -7,6 +7,9 @@ RSpec.describe PromptSchema::TypeSchemaCompiler do
       required(:address).hash do
         required(:street).filled(Dry::Types["nominal.string"].meta(something: "Something", description: "Street address"))
       end
+      required(:hobbies).array(:hash) do
+        required(:name).filled(Dry::Types["nominal.string"].meta(description: "Hobby name"))
+      end
     end
 
     result = subject.call(schema.type_schema.to_ast)
@@ -27,6 +30,19 @@ RSpec.describe PromptSchema::TypeSchemaCompiler do
             description: "Street address",
             something: "Something",
             maybe: false
+          }
+        },
+        hobbies: {
+          required: false,
+          type: "array",
+          maybe: false,
+          items: {
+            name: {
+              required: false,
+              type: "string",
+              description: "Hobby name",
+              maybe: false
+            }
           }
         }
       }
