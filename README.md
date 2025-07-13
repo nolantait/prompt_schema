@@ -1,7 +1,7 @@
 # PromptSchema
 
 This is a library to give you BAML style JSON schemas that you can feed to an
-LLM using `dry-schema`.
+LLM using your existing `dry-schema` with annotated types.
 
 ## Installation
 
@@ -78,7 +78,7 @@ end
 
 schema = PromptSchema.define do
   required(:user).hash do
-    required(:email).maybe(type?: Types::Email)
+    required(:email).maybe(Types::Email)
   end
 end
 
@@ -110,7 +110,7 @@ We turn the dry schema AST into a structure that looks like this:
 ```ruby
 schema = Dry::Schema.Params do
   required(:user).hash do
-    required(:email).value(type?: Types::Email)
+    required(:email).value(Types::Email)
   end
 end
 
