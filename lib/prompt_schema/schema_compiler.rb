@@ -151,8 +151,6 @@ module PromptSchema
 
       meta = @type_schema.dig(*opts[:key_path])
       keys[key].merge!(meta.slice(:description, :example)) if meta
-
-      debugger if meta.nil? && key == :email
     end
   end
 end
