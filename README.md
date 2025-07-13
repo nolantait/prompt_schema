@@ -105,7 +105,8 @@ This can be useful to get the best parts of BAML in a ruby native way.
 All `Dry::Schema` objects have an Abstract Syntax Tree (AST) that we can tap
 into to build another representation.
 
-We turn the dry schema AST into a structure that looks like this:
+We turn the dry schema AST (and its corresponding type schema AST) into
+a structure that looks like this:
 
 ```ruby
 schema = Dry::Schema.Params do
