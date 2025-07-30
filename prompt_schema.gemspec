@@ -8,8 +8,11 @@ Gem::Specification.new do |spec|
   spec.authors = ["Nolan J Tait"]
   spec.email = ["nolanjtait@gmail.com"]
 
-  spec.summary = "A schema for LLMs"
-  spec.description = spec.summary
+  spec.summary =
+    "Generate prompt schemas for LLMs to get and check structured data."
+  spec.description =
+    "Generate BAML style prompts from dry-schema that can get and check " \
+    "structured responses from LLMs"
   spec.homepage = "https://github.com/nolantait/prompt_schema"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.4.0"
@@ -20,7 +23,8 @@ Gem::Specification.new do |spec|
   spec.metadata['rubygems_mfa_required'] = 'true'
 
   # Specify which files should be added to the gem when it is released.
-  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+  # The `git ls-files -z` loads the files in the RubyGem that have been added
+  # into git.
   gemspec = File.basename(__FILE__)
   spec.files = IO.popen(
     %w[git ls-files -z],
@@ -37,9 +41,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "dry-schema"
-  spec.add_dependency "dry-types"
-  spec.add_dependency "phlex"
+  spec.add_dependency "dry-schema", "~> 1"
+  spec.add_dependency "dry-types", "~> 1"
+  spec.add_dependency "phlex", "~> 2"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

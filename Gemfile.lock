@@ -2,9 +2,9 @@ PATH
   remote: .
   specs:
     prompt_schema (0.1.0)
-      dry-schema
-      dry-types
-      phlex
+      dry-schema (~> 1)
+      dry-types (~> 1)
+      phlex (~> 2)
 
 GEM
   remote: https://rubygems.org/

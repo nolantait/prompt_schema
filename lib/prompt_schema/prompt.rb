@@ -38,7 +38,7 @@ module PromptSchema
       handle_type(key, info)
     end
 
-    def handle_type(key, info)
+    def handle_type(key, info) # rubocop:disable Metrics/AbcSize
       case info[:type]
       when "array"
         if info[:member].is_a?(Hash)
