@@ -28,6 +28,14 @@ module PromptSchema
     Schema.new(dry_schema)
   end
 
+  # Compiles a schema into a format suitable for generating prompts.
+  # This is a wrapper around `PromptSchema::SchemaCompiler.call`.
+  #
+  # @example
+  # PromptSchema.compile(schema)
+  #
+  # @param schema [Dry::Schema::Schema] The schema to compile.
+  # @return [Hash] The compiled schema as a hash.
   def self.compile(schema)
     SchemaCompiler.call(schema)
   end
