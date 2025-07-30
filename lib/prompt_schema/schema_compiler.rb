@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module PromptSchema
-  class SchemaCompiler
+  # Compiles a Dry::Schema schema into a hash representation that can be used
+  # to generate prompts for LLMs.
+  class SchemaCompiler # rubocop:disable Metrics/ClassLength
     EMPTY_HASH = {}.freeze
 
     PREDICATE_TO_TYPE = {
@@ -22,26 +24,35 @@ module PromptSchema
 
     def self.call(schema) = new(schema).call
 
+    # @param schema [Dry::Schema::Schema] The schema to compile.
     def initialize(schema)
       @schema = schema
       @type_schema = TypeSchemaCompiler.call(schema.type_schema.to_ast)
       @keys = EMPTY_HASH.dup
     end
 
+    # @return [Hash] The compiled schema as a hash.
     def to_h
       { keys: keys }
     end
 
+    # @return [Hash] The compiled schema as a hash
     def call
       visit(@schema.to_ast)
       to_h
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit(node, **)
       meth, rest = node
       public_send(:"visit_#{meth}", rest, **)
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit_set(node, **opts)
       key = opts[:key]
       target = key ? self.class.new(@schema) : self
@@ -57,6 +68,9 @@ module PromptSchema
       keys.update(key => data)
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit_and(node, **)
       left, right = node
 
@@ -64,6 +78,9 @@ module PromptSchema
       visit(right, **)
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit_implication(node, **)
       case node
       in [:not, [:predicate, [:nil?, _]]], el
@@ -75,6 +92,9 @@ module PromptSchema
       end
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit_each(node, **opts)
       opts[:key_path] ||= []
       opts[:key_path] << :items
@@ -82,6 +102,9 @@ module PromptSchema
       visit(node, **opts, member: true)
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit_key(node, **opts)
       name, rest = node
       opts[:key_path] ||= []
@@ -91,6 +114,9 @@ module PromptSchema
       opts[:key_path].pop
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit_predicate(node, **opts)
       name, rest = node
       key = opts[:key]
@@ -105,6 +131,10 @@ module PromptSchema
       end
     end
 
+    # @param name [Symbol] The name of the predicate.
+    # @param key [Symbol] The key to assign the type to.
+    # @param opts [Hash] Additional options for assigning the type.
+    # @return [void]
     def visit_predicate_base_type(name, key, **opts)
       type = PREDICATE_TO_TYPE[name]
       return unless type
@@ -117,12 +147,18 @@ module PromptSchema
       )
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit_predicate_key(node, **opts)
       (_, name), = node
       keys[name] ||= {}
       keys[name] = { **keys[name], required: opts.fetch(:required, true) }
     end
 
+    # @param node [Array] The AST node to visit.
+    # @param opts [Hash] Options for visiting the node.
+    # @return [void]
     def visit_predicate_type(node, **opts)
       (_type, type_class), _input = node
       key = opts[:key]
@@ -141,6 +177,10 @@ module PromptSchema
       end
     end
 
+    # @param key [Symbol] The key to assign the type to.
+    # @param type [String] The type to assign to the key.
+    # @param opts [Hash] Additional options for assigning the type.
+    # @return [void]
     def assign_type(key, type, **opts)
       if keys.dig(key, :type)
         keys[key][:member] = type
