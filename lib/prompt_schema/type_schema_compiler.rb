@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 module PromptSchema
+  # Compiles a Dry::Types AST into a type schema hash. This is required because
+  # we need to get the specific metadata information which is only available in
+  # the Dry::Types AST, not in the Dry::Schema AST.
   class TypeSchemaCompiler
     def self.call(ast) = new.call(ast)
 

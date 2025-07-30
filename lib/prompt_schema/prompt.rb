@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
 module PromptSchema
+  # Generates a prompt for an LLM based on a compiled schema.
   class Prompt < Phlex::HTML
+    # @param schema [Hash] The compiled schema to generate the prompt for.
+    #   This should be the output of `PromptSchema::SchemaCompiler.call`.
+    # @example
+    #   PromptSchema::Prompt.new(schema).call
+    # @return [String] The generated prompt.
     def initialize(schema)
       @compiled = SchemaCompiler.call(schema)
       @indentation = 0
