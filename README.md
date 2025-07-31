@@ -1,7 +1,9 @@
 # PromptSchema
 
-This is a library to give you BAML style JSON schemas that you can feed to an
-LLM using your existing `dry-schema` with annotated types.
+This is a library to give you [BAML](https://github.com/BoundaryML/baml) style
+JSON schemas that you can feed to an LLM using your existing
+[`dry-schema`](https://github.com/dry-rb/dry-schema) with
+annotated types.
 
 ## Installation
 
