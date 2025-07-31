@@ -44,9 +44,15 @@ end
 
 schema.is_a?(PromptSchema::Schema) #=> true
 schema.dry_schema.is_a?(Dry::Schema) #=> true
+```
 
+Then you can use these schemas to check the data the LLM gives you back just
+like you normally do with `dry-schema`.
+
+```ruby
 result = schema.call({ user: { email: "email@example.com" }})
 result.success? #=> true
+result.to_h #=> { user: { email: "email@example.com" }}
 ```
 
 Using this schema we can print a ready to go prompt.
